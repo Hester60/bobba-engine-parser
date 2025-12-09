@@ -1,10 +1,9 @@
 {
   "name": "@bobba-engine/parser",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Bobba engine tilemap parser inspired by Habbo rooms with the help of Shroom package.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "keywords": [
     "habbo",
     "tilemap",
@@ -33,12 +32,6 @@
     "README.md",
     "LICENSE"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
