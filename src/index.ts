@@ -1,5 +1,6 @@
 export * from './types/Tile';
 export * from './types/TileMap';
+export * from './utils/getTileMapMeta';
 export * from './utils/getTileMeta';
 export * from './utils/ensureTileMapBorders';
 export * from './utils/resolveTileCode';

@@ -34,9 +34,9 @@ import { isNonEmptyTile } from './isNonEmptyTile';
 export function getTileMeta(tilemap: TileMap, x: number, y: number): TileMeta {
   const type = resolveTileCodeAt(tilemap, x, y);
 
-  const leftType = resolveTileCodeAt(tilemap, x - 1, y);
-  const topType = resolveTileCodeAt(tilemap, x, y - 1);
-  const topLeftDiagonalType = resolveTileCodeAt(tilemap, x - 1, y - 1);
+  const leftType = resolveTileCodeAt(tilemap, x, y, 'left');
+  const topType = resolveTileCodeAt(tilemap, x, y, 'top');
+  const topLeftDiagonalType = resolveTileCodeAt(tilemap, x, y, 'topLeft');
 
   const leftIsEmpty = leftType === 'x';
   const topIsEmpty = topType === 'x';
