@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.ibb.co/ym6QMmfw/bobba-engine-logo.png" alt="Bobba Engine Logo"/>
+  <img src="https://i.ibb.co/ym6QMmfw/bobba-engine-logo.png" alt="Bobba Engine Logo" width="500"/>
   
   # @bobba-engine/parser
   
