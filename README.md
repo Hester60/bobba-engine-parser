@@ -1,7 +1,7 @@
 # @bobba-engine/parser
 
 [![CI](https://github.com/Hester60/bobba-engine-parser/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Hester60/bobba-engine-parser/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/@bobba-engine%2Fparser.svg)](https://www.npmjs.com/package/@bobba-engine/parser)
+[![npm version](https://img.shields.io/npm/v/%40bobba-engine%2Fparser)](https://www.npmjs.com/package/@bobba-engine/parser)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A TypeScript library for parsing and manipulating 2D isometric tilemaps, inspired by Habbo Hotel rooms and the [Shroom](https://github.com/jankuss/shroom) package.
