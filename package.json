@@ -1,0 +1,74 @@
+{
+  "name": "@bobba-engine/parser",
+  "version": "1.0.0",
+  "description": "Bobba engine tilemap parser inspired by Habbo rooms with the help of Shroom package.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "keywords": [
+    "habbo",
+    "tilemap",
+    "parser",
+    "bobba",
+    "engine",
+    "room",
+    "shroom",
+    "isometric"
+  ],
+  "license": "MIT",
+  "author": "CARBUCCIA Thomas",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hester60/bobba-engine-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Hester60/bobba-engine-parser/issues"
+  },
+  "homepage": "https://github.com/Hester60/bobba-engine-parser#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "prepare": "husky",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "lint-staged": "^15.2.11",
+    "prettier": "^3.7.4",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
