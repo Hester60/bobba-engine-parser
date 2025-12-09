@@ -355,8 +355,37 @@ MIT © CARBUCCIA Thomas
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+### Branch Strategy
+
+This project uses a protected branch workflow:
+
+- **`main`** - Production branch (protected, requires PR + CI ✅)
+- **`develop`** - Development branch (protected, requires PR + CI ✅)
+- **`feature/*`** - Feature branches (create from `develop`)
+
+### Contribution Workflow
+
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create your feature branch from `develop`:
+   ```bash
+   git checkout develop
+   git checkout -b feature/amazing-feature
+   ```
+3. Make your changes (hooks will auto-lint and format on commit)
+4. Ensure tests pass locally: `npm test`
+5. Push to your fork:
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+6. Open a Pull Request to `develop`
+   - ✅ All tests must pass (CI will run automatically)
+   - ✅ Code will be reviewed before merge
+
+### Branch Protection
+
+Both `main` and `develop` are protected:
+
+- ❌ Direct pushes are blocked
+- ✅ Pull Requests required
+- ✅ CI must pass before merging
+- ✅ Pre-commit hooks enforce code quality
