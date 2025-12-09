@@ -10,11 +10,11 @@ A TypeScript library for parsing and manipulating 2D isometric tilemaps, inspire
 
 ## Features
 
-- 🗺️ **Parse 2D Tilemaps**: Convert encoded tilemap strings into structured data
-- 🔍 **Tile Metadata**: Compute edges, corners, and height information for rendering
-- 🛠️ **Utility Functions**: Helper functions for tilemap manipulation and analysis
+- 🗺️ **Complete Tilemap Analysis**: Get full metadata for all tiles in one function call
+- 🔍 **Rich Tile Information**: Heights, edges, corners, positions, and codes for each tile
+- 🎯 **Simple API**: One main function (`getTileMapMeta`) does all the work
+- 🛠️ **Utility Functions**: Low-level helpers available for advanced use cases
 - 📦 **TypeScript First**: Fully typed API with comprehensive type definitions
-- ✅ **Well Tested**: Extensive test coverage for reliability
 
 ## Installation
 
@@ -33,7 +33,7 @@ pnpm add @bobba-engine/parser
 ## Quick Start
 
 ```typescript
-import { getTileMeta, ensureTileMapBorders, TileMap } from '@bobba-engine/parser';
+import { getTileMapMeta, TileMap } from '@bobba-engine/parser';
 
 // Define your tilemap
 const tilemap: TileMap = [
@@ -42,18 +42,25 @@ const tilemap: TileMap = [
   ['x', '0', '0', '1', '0'],
 ];
 
-// Ensure borders around the tilemap
-const { tilemap: borderedMap, offsetX, offsetY } = ensureTileMapBorders(tilemap);
+// Get complete metadata for the entire tilemap
+const result = getTileMapMeta(tilemap);
 
-// Get metadata for a specific tile
-const meta = getTileMeta(borderedMap, 2, 2);
-console.log(meta);
+// Access metadata for any tile
+console.log(result.tilesMeta[2][3]);
 // {
-//   height: 0,
-//   rowEdge: true,
+//   x: 3,
+//   y: 2,
+//   initialCode: '1',
+//   height: 1,
+//   resolvedCode: 1,
+//   rowEdge: false,
 //   colEdge: false,
-//   innerEdge: false
+//   innerEdge: false,
+//   isEmpty: false
 // }
+
+// Check if borders were added
+console.log(`Offsets: X=${result.offsetX}, Y=${result.offsetY}`);
 ```
 
 ## Tilemap Format
@@ -79,7 +86,63 @@ This represents a small room with mostly flat tiles (`'0'`) and one elevated til
 
 ## API Reference
 
+### Main Function
+
+#### `getTileMapMeta(tilemap)`
+
+**🎯 The primary function** - Computes complete metadata for an entire tilemap in one call. This is what you'll use most of the time.
+
+**Parameters:**
+
+- `tilemap: TileMap` - The 2D tilemap array
+
+**Returns:** `TileMapMeta`
+
+```typescript
+type TileMapMeta = {
+  tilemap: TileMap; // The tilemap with ensured borders
+  offsetX: number; // Columns added to the left (for repositioning)
+  offsetY: number; // Rows added to the top (for repositioning)
+  tilesMeta: FullTileMeta[][]; // Complete metadata for each tile
+};
+```
+
+**Example:**
+
+```typescript
+const result = getTileMapMeta(tilemap);
+
+// Access any tile's metadata
+const tile = result.tilesMeta[y][x];
+
+// Render based on metadata
+if (!tile.isEmpty) {
+  renderTile(tile.x, tile.y, tile.height);
+  if (tile.rowEdge) renderLeftEdge(tile.x, tile.y);
+  if (tile.colEdge) renderTopEdge(tile.x, tile.y);
+  if (tile.innerEdge) renderInnerCorner(tile.x, tile.y);
+}
+```
+
 ### Types
+
+#### `FullTileMeta`
+
+Complete metadata for a single tile:
+
+```typescript
+type FullTileMeta = {
+  x: number; // Column index
+  y: number; // Row index
+  initialCode: string; // Original tile code ('0', '9', 'a', 'x', etc.)
+  height?: number; // Numeric height (0-31) or undefined for empty tiles
+  resolvedCode: number | 'x'; // Resolved numeric value or 'x'
+  rowEdge: boolean; // True if tile has an empty space to its left
+  colEdge: boolean; // True if tile has an empty space above
+  innerEdge: boolean; // True if tile forms an inner corner
+  isEmpty: boolean; // True if the tile is empty ('x')
+};
+```
 
 #### `TileCode`
 
@@ -97,164 +160,56 @@ type TileMap = TileCode[][];
 
 A 2D array representing the complete tilemap.
 
-#### `TileMeta`
+### Utility Functions
 
-```typescript
-type TileMeta = {
-  height?: number; // Numeric height (0-31) or undefined for empty tiles
-  rowEdge: boolean; // True if tile has an empty space to its left
-  colEdge: boolean; // True if tile has an empty space above
-  innerEdge: boolean; // True if tile forms an inner corner
-};
-```
-
-Metadata describing a tile's position and relationship to neighboring tiles.
-
-### Functions
+These functions are exported for advanced use cases, but **most users should use `getTileMapMeta()` instead**.
 
 #### `getTileMeta(tilemap, x, y)`
 
-Computes metadata for a specific tile in the tilemap.
+Computes metadata for a single tile at a specific position.
 
-**Parameters:**
-
-- `tilemap: TileMap` - The 2D tilemap array
-- `x: number` - Column index
-- `y: number` - Row index
-
-**Returns:** `TileMeta`
-
-**Example:**
-
-```typescript
-const meta = getTileMeta(tilemap, 3, 2);
-// Analyzes the tile at position (3, 2) and its neighbors
-```
+**Parameters:** `tilemap: TileMap`, `x: number`, `y: number`  
+**Returns:** `TileMeta` (without position and code information)
 
 #### `ensureTileMapBorders(tilemap)`
 
-Ensures the tilemap has a border of empty tiles (`'x'`) along the top row and leftmost column. Adds padding if necessary.
-
-**Parameters:**
-
-- `tilemap: TileMap` - The original tilemap
-
-**Returns:** `TileMapBordersResult`
-
-```typescript
-type TileMapBordersResult = {
-  tilemap: TileMap; // The padded tilemap
-  offsetX: number; // Columns added to the left
-  offsetY: number; // Rows added to the top
-};
-```
-
-**Example:**
-
-```typescript
-const result = ensureTileMapBorders(tilemap);
-console.log(`Added ${result.offsetX} columns and ${result.offsetY} rows`);
-```
+Ensures the tilemap has borders of empty tiles. Used internally by `getTileMapMeta()`.
 
 #### `resolveTileCode(tileCode)`
 
-Converts a tile code into its numeric height value.
-
-**Parameters:**
-
-- `tileCode: TileCode` - The tile code to resolve
-
-**Returns:** `number | 'x'`
-
-**Example:**
-
-```typescript
-resolveTileCode('0'); // 0
-resolveTileCode('9'); // 9
-resolveTileCode('a'); // 10
-resolveTileCode('v'); // 31
-resolveTileCode('x'); // 'x'
-```
+Converts a tile code string to its numeric value: `'0'` → `0`, `'a'` → `10`, `'x'` → `'x'`
 
 #### `resolveTileCodeAt(tilemap, x, y, offset?)`
 
-Gets the resolved height value of a tile at a specific position, with optional neighbor offset.
-
-**Parameters:**
-
-- `tilemap: TileMap` - The tilemap
-- `x: number` - Column index
-- `y: number` - Row index
-- `offset?: keyof typeof offsets` - Optional direction offset (default: `'none'`)
-
-**Available offsets:** `'none'`, `'top'`, `'bottom'`, `'left'`, `'right'`, `'topLeft'`, `'topRight'`, `'bottomLeft'`, `'bottomRight'`
-
-**Returns:** `number | 'x'`
-
-**Example:**
-
-```typescript
-const height = resolveTileCodeAt(tilemap, 2, 2);
-const topNeighbor = resolveTileCodeAt(tilemap, 2, 2, 'top');
-```
+Gets the resolved value of a tile at position `(x, y)` with optional neighbor offset (`'top'`, `'left'`, etc.)
 
 #### `isNonEmptyTile(tile)`
 
-Checks if a tile is non-empty (not `'x'`).
-
-**Parameters:**
-
-- `tile: number | string` - The tile to check
-
-**Returns:** `boolean`
-
-**Example:**
-
-```typescript
-isNonEmptyTile(0); // true
-isNonEmptyTile('x'); // false
-```
-
-### Constants
-
-#### `offsets`
-
-Predefined direction offsets for neighbor tile calculations.
-
-```typescript
-const offsets = {
-  none: { x: 0, y: 0 },
-  top: { x: 0, y: -1 },
-  bottom: { x: 0, y: 1 },
-  left: { x: -1, y: 0 },
-  right: { x: 1, y: 0 },
-  topLeft: { x: -1, y: -1 },
-  topRight: { x: 1, y: -1 },
-  bottomLeft: { x: -1, y: 1 },
-  bottomRight: { x: 1, y: 1 },
-} as const;
-```
+Checks if a tile is not empty: `isNonEmptyTile('x')` → `false`, `isNonEmptyTile(0)` → `true`
 
 ## Use Cases
 
 ### Rendering Isometric Rooms
 
-Use tile metadata to determine which edges and corners to render:
+Use the complete tilemap metadata to render tiles with proper edges and corners:
 
 ```typescript
-for (let y = 0; y < tilemap.length; y++) {
-  for (let x = 0; x < tilemap[y].length; x++) {
-    const meta = getTileMeta(tilemap, x, y);
+import { getTileMapMeta } from '@bobba-engine/parser';
 
-    if (meta.height !== undefined) {
-      renderTile(x, y, meta.height);
+const { tilesMeta } = getTileMapMeta(tilemap);
 
-      if (meta.rowEdge) renderLeftEdge(x, y);
-      if (meta.colEdge) renderTopEdge(x, y);
-      if (meta.innerEdge) renderInnerCorner(x, y);
+// Render all tiles with their metadata
+tilesMeta.forEach((row) => {
+  row.forEach((tile) => {
+    if (!tile.isEmpty) {
+      renderTile(tile.x, tile.y, tile.height);
+
+      if (tile.rowEdge) renderLeftEdge(tile.x, tile.y);
+      if (tile.colEdge) renderTopEdge(tile.x, tile.y);
+      if (tile.innerEdge) renderInnerCorner(tile.x, tile.y);
     }
-  }
-}
+  });
+});
 ```
 
 ### Collision Detection
@@ -262,20 +217,35 @@ for (let y = 0; y < tilemap.length; y++) {
 Check if a position is walkable:
 
 ```typescript
-function isWalkable(tilemap: TileMap, x: number, y: number): boolean {
-  const tileCode = resolveTileCodeAt(tilemap, x, y);
-  return tileCode !== 'x'; // Not empty
+const { tilesMeta } = getTileMapMeta(tilemap);
+
+function isWalkable(x: number, y: number): boolean {
+  return !tilesMeta[y]?.[x]?.isEmpty;
 }
 ```
 
 ### Pathfinding Integration
 
-Convert tilemap data for use with pathfinding algorithms:
+Convert tilemap metadata for use with pathfinding algorithms:
 
 ```typescript
-function createPathfindingGrid(tilemap: TileMap) {
-  return tilemap.map((row) => row.map((tile) => (isNonEmptyTile(tile) ? 0 : 1)));
-}
+const { tilesMeta } = getTileMapMeta(tilemap);
+
+const pathfindingGrid = tilesMeta.map(
+  (row) => row.map((tile) => (tile.isEmpty ? 1 : 0)), // 0 = walkable, 1 = blocked
+);
+```
+
+### Analyzing Tile Heights
+
+Find all tiles at a specific height:
+
+```typescript
+const { tilesMeta } = getTileMapMeta(tilemap);
+
+const tilesAtHeight2 = tilesMeta.flat().filter((tile) => tile.height === 2);
+
+console.log(`Found ${tilesAtHeight2.length} tiles at height 2`);
 ```
 
 ## Development
@@ -329,16 +299,17 @@ git push --no-verify
 @bobba-engine/parser/
 ├── src/
 │   ├── types/           # TypeScript type definitions
-│   │   ├── Tile.ts
-│   │   └── TileMap.ts
+│   │   ├── Tile.ts      # TileMeta, FullTileMeta
+│   │   └── TileMap.ts   # TileMap, TileMapMeta, TileCode
 │   ├── utils/           # Utility functions
-│   │   ├── ensureTileMapBorders.ts
+│   │   ├── getTileMapMeta.ts      # 🎯 Main function
 │   │   ├── getTileMeta.ts
-│   │   ├── isNonEmptyTile.ts
-│   │   ├── offsets.ts
+│   │   ├── ensureTileMapBorders.ts
+│   │   ├── resolveTileCodeAt.ts
 │   │   ├── resolveTileCode.ts
-│   │   └── resolveTileCodeAt.ts
-│   └── index.ts         # Main entry point
+│   │   ├── isNonEmptyTile.ts
+│   │   └── offsets.ts
+│   └── index.ts         # Main entry point (exports)
 ├── dist/                # Compiled output
 ├── package.json
 ├── tsconfig.json
@@ -348,6 +319,30 @@ git push --no-verify
 ## Inspiration
 
 This project is inspired by the [Shroom](https://github.com/jankuss/shroom) library and the Habbo Hotel room system. It aims to provide lightweight, reusable utilities for working with isometric tilemap data.
+
+## AI Assistance
+
+To improve development efficiency and code quality, certain parts of this project were generated with AI assistance (Claude Sonnet 4.5). This includes:
+
+- 🧪 **Unit Tests**: Comprehensive test suites for complex functions
+- 📚 **Documentation**: Parts of JSDoc comments and README sections
+- 🔍 **Code Review**: Optimization suggestions and best practices
+
+Files that contain AI-generated content are clearly marked with a note in their header comments. For example:
+
+```typescript
+/**
+ * @note These tests were generated with AI assistance (Claude Sonnet 4.5)
+ */
+```
+
+All AI-generated code has been:
+
+- ✅ Reviewed and validated by human developers
+- ✅ Tested to ensure correctness and reliability
+- ✅ Adapted to fit the project's architecture and standards
+
+We believe in transparency about the tools used in development while maintaining high standards for code quality.
 
 ## License
 

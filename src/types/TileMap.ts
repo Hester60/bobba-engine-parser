@@ -1,3 +1,5 @@
+import { FullTileMeta } from './Tile';
+
 /**
  * Height of a tile
  * Character range:
@@ -61,4 +63,19 @@ export type TileMapBordersResult = {
   tilemap: TileMap;
   offsetX: number;
   offsetY: number;
+};
+
+/**
+ * Complete metadata result for an entire tilemap.
+ *
+ * - `tilemap`: The tilemap with ensured borders.
+ * - `offsetX`: Number of columns added to the left during border ensuring.
+ * - `offsetY`: Number of rows added to the top during border ensuring.
+ * - `tilesMeta`: 2D array containing complete metadata for each tile, matching the dimensions of `tilemap`.
+ */
+export type TileMapMeta = {
+  tilemap: TileMap;
+  offsetX: number;
+  offsetY: number;
+  tilesMeta: FullTileMeta[][];
 };
