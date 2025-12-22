@@ -11,6 +11,7 @@ export type TileMeta = {
   rowEdge: boolean;
   colEdge: boolean;
   innerEdge: boolean;
+  neighbors: TileNeighbors;
 };
 
 /**
@@ -35,5 +36,17 @@ export type FullTileMeta = {
   colEdge: boolean;
   innerEdge: boolean;
   isEmpty: boolean;
+  neighbors: TileNeighbors;
   resolvedCode: number | 'x';
+};
+
+export type TileNeighborsDetails = {
+  height: number;
+};
+
+export type TileNeighbors = {
+  top: TileNeighborsDetails;
+  bottom: TileNeighborsDetails;
+  left: TileNeighborsDetails;
+  right: TileNeighborsDetails;
 };

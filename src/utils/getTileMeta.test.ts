@@ -18,6 +18,12 @@ describe('getTileMeta', () => {
       rowEdge: false,
       colEdge: false,
       innerEdge: true,
+      neighbors: {
+        top: { height: 0 },
+        bottom: { height: 0 },
+        left: { height: 0 },
+        right: { height: 0 },
+      },
     };
 
     expect(getTileMeta(tilemap, 3, 4)).toEqual(expectedResult);
@@ -29,6 +35,12 @@ describe('getTileMeta', () => {
       rowEdge: true,
       colEdge: false,
       innerEdge: false,
+      neighbors: {
+        top: { height: 0 },
+        bottom: { height: 0 },
+        left: { height: 0 },
+        right: { height: 0 },
+      },
     };
 
     expect(getTileMeta(tilemap, 1, 5)).toEqual(expectedResult);
@@ -40,6 +52,12 @@ describe('getTileMeta', () => {
       rowEdge: true,
       colEdge: true,
       innerEdge: false,
+      neighbors: {
+        top: { height: 0 },
+        bottom: { height: 0 },
+        left: { height: 0 },
+        right: { height: 0 },
+      },
     };
 
     expect(getTileMeta(tilemap, 1, 4)).toEqual(expectedResult);
@@ -51,6 +69,12 @@ describe('getTileMeta', () => {
       rowEdge: false,
       colEdge: false,
       innerEdge: false,
+      neighbors: {
+        top: { height: 0 },
+        bottom: { height: 0 },
+        left: { height: 0 },
+        right: { height: 0 },
+      },
     };
 
     expect(getTileMeta(tilemap, 1, 1)).toEqual(expectedResult);
@@ -62,6 +86,12 @@ describe('getTileMeta', () => {
       rowEdge: false,
       colEdge: false,
       innerEdge: false,
+      neighbors: {
+        top: { height: 0 },
+        bottom: { height: 0 },
+        left: { height: 0 },
+        right: { height: 0 },
+      },
     };
 
     expect(getTileMeta(tilemap, -1, -1)).toEqual(expectedResult);
