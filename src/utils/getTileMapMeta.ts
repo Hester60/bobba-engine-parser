@@ -46,6 +46,7 @@ export function getTileMapMeta(initialTilemap: TileMap): TileMapMeta {
           colEdge: meta.colEdge,
           innerEdge: meta.innerEdge,
           isEmpty: meta.height === undefined,
+          neighbors: meta.neighbors,
           resolvedCode,
         };
       });

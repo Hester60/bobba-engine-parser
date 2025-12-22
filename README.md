@@ -92,6 +92,18 @@ This represents a small room with mostly flat tiles (`'0'`) and one elevated til
 
 **🎯 The primary function** - Computes complete metadata for an entire tilemap in one call. This is what you'll use most of the time.
 
+In addition to per-tile height and edge information, this function also
+computes normalized height data for the four direct neighbors of each tile
+(top, bottom, left, right).
+
+Neighbor heights are always numeric and default to `0` for:
+
+- empty tiles (`'x'`)
+- out-of-bounds positions
+
+This makes the output safe to consume for wall detection, room parsing,
+and rendering logic without additional null checks.
+
 **Parameters:**
 
 - `tilemap: TileMap` - The 2D tilemap array
@@ -141,6 +153,13 @@ type FullTileMeta = {
   colEdge: boolean; // True if tile has an empty space above
   innerEdge: boolean; // True if tile forms an inner corner
   isEmpty: boolean; // True if the tile is empty ('x')
+  neighbors: {
+    // Always defined
+    top: { height: number };
+    bottom: { height: number };
+    left: { height: number };
+    right: { height: number };
+  };
 };
 ```
 
@@ -186,6 +205,37 @@ Gets the resolved value of a tile at position `(x, y)` with optional neighbor of
 #### `isNonEmptyTile(tile)`
 
 Checks if a tile is not empty: `isNonEmptyTile('x')` → `false`, `isNonEmptyTile(0)` → `true`
+
+#### `getTileNeighbors(tilemap, x, y)`
+
+Returns normalized height information for the four direct neighbors of a tile.
+
+**Parameters:**
+
+- `tilemap: TileMap`
+- `x: number`
+- `y: number`
+
+**Returns:** `TileNeighbors`
+
+Neighbor heights are always numeric and default to `0` for empty or out-of-bounds tiles.
+
+This function is used internally by `getTileMeta`, but is also exported
+for advanced use cases.
+
+#### `resolveTileHeight(tile)`
+
+Resolves the numeric height of a tile.
+
+**Parameters:**
+
+- `tile?: number | string | null` – The tile value. Can be:
+  - a number representing the tile height
+  - a string `'x'` representing an empty tile
+  - null or undefined for out-of-bounds/missing tiles
+
+**Returns:** `number` – The numeric height of the tile.  
+Empty tiles (`'x'`) or null/undefined tiles return `0`.
 
 ## Use Cases
 
@@ -298,19 +348,21 @@ git push --no-verify
 ```
 @bobba-engine/parser/
 ├── src/
-│   ├── types/           # TypeScript type definitions
-│   │   ├── Tile.ts      # TileMeta, FullTileMeta
-│   │   └── TileMap.ts   # TileMap, TileMapMeta, TileCode
-│   ├── utils/           # Utility functions
-│   │   ├── getTileMapMeta.ts      # 🎯 Main function
+│   ├── types/               # TypeScript type definitions
+│   │   ├── Tile.ts          # TileMeta, FullTileMeta, TileNeighbors
+│   │   └── TileMap.ts       # TileMap, TileMapMeta, TileCode
+│   ├── utils/               # Utility functions
+│   │   ├── getTileMapMeta.ts        # 🎯 Main function
 │   │   ├── getTileMeta.ts
+│   │   ├── getTileNeighbors.ts
 │   │   ├── ensureTileMapBorders.ts
 │   │   ├── resolveTileCodeAt.ts
 │   │   ├── resolveTileCode.ts
+│   │   ├── resolveTileHeight.ts
 │   │   ├── isNonEmptyTile.ts
 │   │   └── offsets.ts
-│   └── index.ts         # Main entry point (exports)
-├── dist/                # Compiled output
+│   └── index.ts             # Main entry point (exports)
+├── dist/                    # Compiled output
 ├── package.json
 ├── tsconfig.json
 └── README.md

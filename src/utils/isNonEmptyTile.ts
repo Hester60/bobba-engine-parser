@@ -15,4 +15,4 @@
  * isNonEmptyTile('x'); // false
  * ```
  */
-export const isNonEmptyTile = (tile: number | string) => 'x' !== tile;
+export const isNonEmptyTile = (tile: number | string): boolean => 'x' !== tile;
